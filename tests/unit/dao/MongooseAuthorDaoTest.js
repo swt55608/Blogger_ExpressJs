@@ -11,18 +11,18 @@ db.on('error', err => console.error(err));
 db.on('open', () => console.log('Connection to MongoDB'));
 
 describe('MongooseAuthorDao', () => {
+    let authorDao;
+
+    beforeEach(async () => {
+        await AuthorModel.deleteMany();
+        authorDao = new MongooseAuthorDao();
+    });
+
+    after(async () => {
+        await AuthorModel.deleteMany();
+    });
+
     describe("#register()", () => {
-        let authorDao;
-        
-        beforeEach(async () => {
-            await AuthorModel.deleteMany();
-            authorDao = new MongooseAuthorDao();
-        });
-
-        after(async () => {
-            await AuthorModel.deleteMany();
-        });
-
         it('should return TRUE when correct account, password, and name', async () => {
             let author = new Author({account: "mike", password: "mmm", name: "Mike Mouse"});
             assert.strictEqual(await authorDao.register(author), true);
@@ -56,5 +56,35 @@ describe('MongooseAuthorDao', () => {
             author[key] = "";
             assert.strictEqual(await authorDao.register(author), false);
         }
+    });
+
+    describe('#login()', () => {
+        it('should return TRUE when account and password are both correct', async () => {
+            let author = new Author({account: "mike", password: "mmm", name: "Mike Mouse"});
+            assert.strictEqual(await authorDao.register(author), true);
+            assert.strictEqual(await authorDao.login(author), true);
+        });
+
+        it('should return FALSE when account is invalid or does not exist', async () => {
+            let author = new Author({account: "mike", password: "mmm", name: "Mike Mouse"});
+            assert.strictEqual(await authorDao.login(author), false);
+        });
+
+        it('should return FALSE when password is invalid or incorrect', async () => {
+            let author = new Author({account: "mike", password: "mmm", name: "Mike Mouse"});
+            assert.strictEqual(await authorDao.register(author), true);
+
+            author.password = undefined;
+            assert.strictEqual(await authorDao.login(author), false);
+
+            author.password = null;
+            assert.strictEqual(await authorDao.login(author), false);
+
+            author.password = '';
+            assert.strictEqual(await authorDao.login(author), false);
+
+            author.password = 'notasecret';
+            assert.strictEqual(await authorDao.login(author), false);
+        });
     });
 });

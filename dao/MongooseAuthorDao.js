@@ -26,6 +26,20 @@ class MongooseAuthorDao {
         }
     }
 
+    async login(author) {
+        if (!(author instanceof Author))
+            throw 'Invalid Type: Parameter should be Author';
+        return AuthorModel.findOne({account: author.account, password: author.password})
+            .then(doc => {
+                if (doc)
+                    return true;
+                return false;
+            }).catch(err => {
+                console.error(err);
+                return false;
+            });
+    }
+
     async isExist(author) {
         return AuthorModel.findOne({account: author.account})
             .then(doc => {
