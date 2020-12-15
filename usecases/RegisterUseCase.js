@@ -9,13 +9,14 @@ class RegisterUseCase {
         this.authorDao = authorDao;
     }
 
-    execute(authorObj = {account: '', password: '', name: ''}) {
+    async execute(authorObj = {account: '', password: '', name: ''}) {
+        let author = new Author(authorObj);
         if (Validator.isInvalid(authorObj)) {
             return false;
+        } else if (this.authorDao.isExist(author)) {
+            return false;
         } else {
-            let author = new Author(authorObj);
-            this.authorDao.register(author);
-            return true;
+            return await this.authorDao.register(author);
         }
     }
 }

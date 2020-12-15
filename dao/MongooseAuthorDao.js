@@ -2,7 +2,7 @@ const AuthorModel = require('./Author.model');
 const Author = require('../entities/Author');
 
 class MongooseAuthorDao {
-    register(author = new Author('account', 'password', 'name')) {
+    async register(author = new Author('account', 'password', 'name')) {
         if (!(author instanceof Author))
             throw 'Invalid Type: Parameter should be Author';
         let authorModel = new AuthorModel({
@@ -10,12 +10,32 @@ class MongooseAuthorDao {
             password: author.password,
             name: author.name
         });
-        authorModel.save()
+
+        if (await this.isExist(author)) {
+            return false;
+        } else {
+            return authorModel.save()
+                .then(doc => {
+                    // console.log('Saved');
+                    return true;
+                }).catch(err => {
+                    // console.log('Saved Failure');
+                    // console.error(err);
+                    return false;
+                });
+        }
+    }
+
+    async isExist(author) {
+        return AuthorModel.findOne({account: author.account})
             .then(doc => {
-                console.log('Saved');
+                // console.log(doc);
+                if (doc != null)
+                    return true;
+                return false;
             }).catch(err => {
-                console.log('Saved Failure');
                 console.error(err);
+                return false;
             });
     }
 }
