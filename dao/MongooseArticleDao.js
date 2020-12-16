@@ -23,6 +23,10 @@ class MongooseArticleDao {
         }
     }
 
+    async findAll() {
+        return ArticleModel.find();
+    }
+
     async isExist(article = new Article({title: '', contents: '', authorname: ''})) {
         return ArticleModel.findOne({title: article.title})
             .then(doc => {
