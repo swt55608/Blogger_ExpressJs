@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const RegisterUseCase = require('../usecases/RegisterUseCase');
+const LoginUseCase = require('../usecases/LoginUseCase');
 const MongooseAuthorDao = require('../dao/MongooseAuthorDao');
 
 const mongoose = require('mongoose');
@@ -23,15 +24,31 @@ router.post('/register/authors', async (req, res) => {
         statusCode = 500;
         msg = 'Wrong in reqBody';
     }
-    res.status(statusCode).json({msg: msg});
+    // res.status(statusCode).json({msg: msg});
+    res.status(statusCode).render('index', {data: {account: req.session.author}});
 });
 
-// router.post('/login/authors', (req, res) => {
+router.post('/login/authors', async (req, res) => {
+    let statusCode, msg;
+    if (req.body) {
+        let {account, password} = req.body;
+        let authorObj = {account: account, password: password};
+        let isLogin = await new LoginUseCase(new MongooseAuthorDao()).execute(authorObj);
+        req.session.author = isLogin ? authorObj.account : null;
+        statusCode = isLogin ? 200 : 401;
+        msg = isLogin ? 'Login success' : 'Login failure';
+    } else {
+        statusCode = 500;
+        msg = 'Wrong in reqBody';
+    }
+    // res.status(statusCode).json({msg: msg});
+    res.status(statusCode).render('index', {data: {account: req.session.author}});
+});
 
-// });
-
-// router.post('/logout/authors', (req, res) => {
-
-// });
+router.post('/logout/authors', (req, res) => {
+    req.session.destroy();
+    // res.status(200).json({msg: 'Logout success'});
+    res.status(200).render('index', {data: {}});
+});
 
 module.exports = router;
