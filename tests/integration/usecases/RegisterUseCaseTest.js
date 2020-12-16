@@ -1,58 +1,52 @@
 const assert = require('assert');
-const sinon = require('sinon');
 
+const AuthorModel = require('../../../dao/Author.model');
 const MongooseAuthorDao = require('../../../dao/MongooseAuthorDao');
 const RegisterUseCase = require('../../../usecases/RegisterUseCase');
 
+const mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost:27017/blogger_test', {useNewUrlParser: true, useUnifiedTopology: true});
+let db = mongoose.connection;
+db.on('error', () => console.error('Could not connect to MongoDB'));
+db.on('open', () => console.log('Connected to MongoDB'));
+db.on('close', () => console.log('Closed Connection to MongoDB'));
+
 describe('RegisterUseCase', () => {
     describe('#execute()', () => {
-        let sandbox;
-        let authorDaoStubs = {};
-        let registerUseCase, authorDao;
+        let registerUseCase;
 
-        beforeEach(() => {
-            sandbox = sinon.createSandbox();
-            authorDao = new MongooseAuthorDao();
+        beforeEach(async () => {
+            await AuthorModel.deleteMany();
+            let authorDao = new MongooseAuthorDao();
             registerUseCase = new RegisterUseCase(authorDao);
-            authorDaoStubs.register = sandbox.stub(authorDao, 'register');
-            authorDaoStubs.isExist = sandbox.stub(authorDao, 'isExist');
         });
 
-        afterEach(() => {
-            authorDaoStubs.register.restore();
-            authorDaoStubs.isExist.restore();
+        after(async () => {
+            await AuthorModel.deleteMany();
         });
 
         it('should return TRUE when author has valid account, password, and name', async () => {
             let authorObj = {account: "mike", password: "mmm", name: "Mike Mouse"};
-            authorDaoStubs.register.returns(true);
             let isRegistered = await registerUseCase.execute(authorObj);
             assert.strictEqual(isRegistered, true);
         });
 
-        it('should return FALSE when the name has already existed', async () => {
+        it('should return FALSE when the account has already existed', async () => {
             let authorObj = {account: "mike", password: "mmm", name: "Mike Mouse"};
-            authorDaoStubs.isExist.returns(false);
-            authorDaoStubs.register.returns(true); 
             let isRegistered = await registerUseCase.execute(authorObj);
             assert.strictEqual(isRegistered, true);
 
-            let anotherAuthorObj = {account: "jack", password: "jjj", name: "Mike Mouse"};
-            authorDaoStubs.isExist.returns(true);
+            let anotherAuthorObj = {account: "mike", password: "mjmj", name: "Mike Johnson"};
             isRegistered = await registerUseCase.execute(anotherAuthorObj);
             assert.strictEqual(isRegistered, false);
         });
 
-        it('should return FALSE when the account has already existed', async () => {
-            authorDaoStubs.isExist.returns(false);
-            authorDaoStubs.register.returns(true); 
+        it('should return FALSE when the name has already existed', async () => {
             let authorObj = {account: "mike", password: "mmm", name: "Mike Mouse"};
             let isRegistered = await registerUseCase.execute(authorObj);
             assert.strictEqual(isRegistered, true);
 
-            authorDaoStubs.isExist.returns(true);
-            authorDaoStubs.register.returns(false); 
-            let anotherAuthorObj = {account: "mike", password: "mjmj", name: "Mike Johnson"};
+            let anotherAuthorObj = {account: "jack", password: "jjj", name: "Mike Mouse"};
             isRegistered = await registerUseCase.execute(anotherAuthorObj);
             assert.strictEqual(isRegistered, false);
         });

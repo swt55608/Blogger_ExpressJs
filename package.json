@@ -5,7 +5,9 @@
   "scripts": {
     "start": "node ./bin/www",
     "unit-tests": "mocha ./tests/unit --recursive",
-    "coverage": "nyc mocha --timeout 1000"
+    "integration-tests": "mocha ./tests/integration --recursive",
+    "ut-coverage": "nyc mocha ./tests/unit --recursive --timeout 1000",
+    "it-coverage": "nyc mocha ./tests/integration --recursive --timeout 1000"
   },
   "dependencies": {
     "body-parser": "^1.19.0",

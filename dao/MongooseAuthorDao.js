@@ -41,7 +41,7 @@ class MongooseAuthorDao {
     }
 
     async isExist(author) {
-        return AuthorModel.findOne({account: author.account})
+        return AuthorModel.findOne({$or: [{account: author.account}, {name: author.name}]})
             .then(doc => {
                 // console.log(doc);
                 if (doc != null)

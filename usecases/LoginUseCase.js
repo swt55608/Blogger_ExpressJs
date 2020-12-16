@@ -6,7 +6,8 @@ class LoginUseCase {
     constructor(authorDao) {
         if (authorDao === undefined) 
             authorDao = new MongooseAuthorDao();
-        this.authorDao = authorDao;
+        else
+            this.authorDao = authorDao;
     }
 
     async execute(loginInfo = {account: '', password: ''}) {
