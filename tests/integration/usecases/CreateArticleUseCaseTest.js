@@ -14,10 +14,6 @@ describe('CreateArticleUseCase', () => {
             createArticleUseCase = new CreateArticleUseCase(articleDao);   
         });
 
-        after(async () => {
-            await ArticleModel.deleteMany();
-        });
-
         it('should return TRUE when article has valid info', async () => {
             let articleObj = {title: 'Have a nice day', contents: 'Today is a great day, better than yesterday.', authorname: 'mike'};
             assert.strictEqual(await createArticleUseCase.execute(articleObj), true);

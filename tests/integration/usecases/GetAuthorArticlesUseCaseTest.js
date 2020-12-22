@@ -6,26 +6,16 @@ const MongooseArticleDao = require('../../../dao/MongooseArticleDao');
 const ArticleModel = require('../../../dao/Article.model');
 const Utility = require('../../../entities/Utility');
 
-const mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost:27017/blogger_test', {useNewUrlParser: true, useUnifiedTopology: true});
-let db = mongoose.connection;
-db.on('error', () => console.error('Could not connect to MongoDB'));
-db.on('open', () => console.log('Connected to MongoDB'));
-
 describe('GetAuthorArticlesUseCase', () => {
     describe('#execute()', () => {
         let articleDao;
         let getAuthorArticlesUseCase, createArticleUseCase;
 
         beforeEach(async () => {
-            ArticleModel.deleteMany();
+            await ArticleModel.deleteMany();
             articleDao = new MongooseArticleDao();
             createArticleUseCase = new CreateArticleUseCase(articleDao);
             getAuthorArticlesUseCase = new GetAuthorArticlesUseCase(articleDao);
-        });
-
-        after(async () => {
-            ArticleModel.deleteMany();
         });
 
         it('should return empty when there is no article', async () => {

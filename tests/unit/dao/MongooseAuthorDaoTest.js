@@ -5,21 +5,12 @@ const AuthorModel = require('../../../dao/Author.model');
 const MongooseAuthorDao = require('../../../dao/MongooseAuthorDao');
 const Author = require('../../../entities/Author');
 
-mongoose.connect('mongodb://localhost:27017/blogger_test', {useNewUrlParser: true, useUnifiedTopology: true});
-let db = mongoose.connection;
-db.on('error', err => console.error(err));
-db.on('open', () => console.log('Connection to MongoDB'));
-
 describe('MongooseAuthorDao', () => {
     let authorDao;
 
     beforeEach(async () => {
         await AuthorModel.deleteMany();
         authorDao = new MongooseAuthorDao();
-    });
-
-    after(async () => {
-        await AuthorModel.deleteMany();
     });
 
     describe("#register()", () => {

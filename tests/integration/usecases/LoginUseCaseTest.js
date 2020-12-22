@@ -6,13 +6,6 @@ const MongooseAuthorDao = require('../../../dao/MongooseAuthorDao');
 const RegisterUseCase = require('../../../usecases/RegisterUseCase');
 const LoginUseCase = require('../../../usecases/LoginUseCase');
 
-const mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost:27017/blogger_test', {useNewUrlParser: true, useUnifiedTopology: true});
-let db = mongoose.connection;
-db.on('error', () => console.error('Could not connect to MongoDB'));
-db.on('open', () => console.log('Connected to MongoDB'));
-db.on('close', () => console.log('Closed Connection to MongoDB'));
-
 describe('LoginUseCase', () => {
     describe('#execute()', () => {
         let loginUseCase;
@@ -23,10 +16,6 @@ describe('LoginUseCase', () => {
             let registerUseCase = new RegisterUseCase(authorDao);
             await registerUseCase.execute({account: "mike", password: "mmm", name: "Mike Mouse"});
             loginUseCase = new LoginUseCase(authorDao);
-        });
-
-        after(async () => {
-            await AuthorModel.deleteMany();
         });
 
         it('should return TRUE when account and password are both correct', async () => {

@@ -4,13 +4,7 @@ const { after } = require('mocha');
 const ArticleModel = require('../../../dao/Article.model');
 const MongooseArticleDao = require('../../../dao/MongooseArticleDao');
 const Article = require('../../../entities/Article');
-const {convertToJsonObject} = require('../../../entities/Utility');
-
-const mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost:27017/blogger_test', {useNewUrlParser: true, useUnifiedTopology: true});
-let db = mongoose.connection;
-db.on('error', () => console.error('Could not connect to MongoDB'));
-db.on('open', () => console.log('Connected to MongoDB'));
+const Utility = require('../../../entities/Utility');
 
 describe('MongooseArticleDao', () => {
     let articleDao;
@@ -19,10 +13,6 @@ describe('MongooseArticleDao', () => {
         await ArticleModel.deleteMany();
         articleDao = new MongooseArticleDao();
     })
-
-    after(async () => {
-        await ArticleModel.deleteMany();
-    });
 
     describe('#isInvalid()', () => {
         it('should return TRUE when article title is undefined, null, or empty', () => {
@@ -88,7 +78,7 @@ describe('MongooseArticleDao', () => {
         it('should return empty when no article exists', async () => {
             let expectedArticles = [];
             let actualArticles = await articleDao.findAll();
-            assert.deepStrictEqual(convertToJsonObject(actualArticles), convertToJsonObject(expectedArticles));
+            assert.deepStrictEqual(Utility.convertToJsonObject(actualArticles), Utility.convertToJsonObject(expectedArticles));
         });
 
         it('should return all articles', async () => {
@@ -103,7 +93,7 @@ describe('MongooseArticleDao', () => {
             assert.strictEqual(await articleDao.create(expectedArticles[2]), true);
 
             let actualArticles = await articleDao.findAll();
-            assert.deepStrictEqual(convertToJsonObject(actualArticles), convertToJsonObject(expectedArticles));
+            assert.deepStrictEqual(Utility.convertToJsonObject(actualArticles), Utility.convertToJsonObject(expectedArticles));
         });
     });
 
@@ -111,7 +101,7 @@ describe('MongooseArticleDao', () => {
         it('should return empty when no article exists', async () => {
             let expectedArticles = [];
             let actualArticles = await articleDao.findAll();
-            assert.deepStrictEqual(convertToJsonObject(actualArticles), convertToJsonObject(expectedArticles));
+            assert.deepStrictEqual(Utility.convertToJsonObject(actualArticles), Utility.convertToJsonObject(expectedArticles));
         });
 
         it('should return all articles of the author', async () => {
@@ -124,7 +114,7 @@ describe('MongooseArticleDao', () => {
             assert.strictEqual(await articleDao.create(expectedArticles[1]), true);
 
             let actualArticles = await articleDao.findByAuthorName('mike');
-            assert.deepStrictEqual(convertToJsonObject(actualArticles), convertToJsonObject(expectedArticles));
+            assert.deepStrictEqual(Utility.convertToJsonObject(actualArticles), Utility.convertToJsonObject(expectedArticles));
         });
     });
 });

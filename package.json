@@ -4,10 +4,10 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "unit-tests": "mocha ./tests/unit --recursive",
-    "integration-tests": "mocha ./tests/integration --recursive",
-    "ut-coverage": "nyc mocha ./tests/unit --recursive --timeout 1000",
-    "it-coverage": "nyc mocha ./tests/integration --recursive --timeout 1000"
+    "unit-tests": "mocha ./tests/initDbConnectAndFinalClose ./tests/unit --recursive --timeout 2000",
+    "integration-tests": "mocha ./tests/initDbConnectAndFinalClose ./tests/integration --recursive --timeout 2000",
+    "ut-coverage": "nyc npm run unit-tests",
+    "it-coverage": "nyc npm run integration-tests"
   },
   "dependencies": {
     "body-parser": "^1.19.0",
