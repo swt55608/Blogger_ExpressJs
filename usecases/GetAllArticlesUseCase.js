@@ -1,3 +1,5 @@
+const Utility = require('../entities/Utility');
+
 class GetAllArticlesUseCase {
     constructor(articleDao) {
         if (articleDao === undefined) {
@@ -9,15 +11,7 @@ class GetAllArticlesUseCase {
 
     async execute() {
         let articles = await this.articleDao.findAll();
-        let articlesObj = this.convertArticlesToObject(articles);
-        return articlesObj;
-    }
-
-    convertArticlesToObject(articles) {
-        let articlesObj = [];
-        for (let article of articles) {
-            articlesObj.push({title: article.title, contents: article.contents, authorname: article.authorname});
-        }
+        let articlesObj = Utility.convertToJsonObject(articles);
         return articlesObj;
     }
 }

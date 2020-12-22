@@ -27,6 +27,18 @@ class MongooseArticleDao {
         return ArticleModel.find();
     }
 
+    async findByAuthorName(searchAuthorname = '') {
+        return ArticleModel.find({authorname: searchAuthorname})
+            .then(docs => {
+                if (docs !== null && docs.length > 0)
+                    return docs;
+                return [];
+            }).catch(err => {
+                console.error(err);
+                return [];
+            });
+    }
+
     async isExist(article = new Article({title: '', contents: '', authorname: ''})) {
         return ArticleModel.findOne({title: article.title})
             .then(doc => {
