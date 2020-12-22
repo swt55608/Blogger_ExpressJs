@@ -1,6 +1,5 @@
 const MongooseArticleDao = require('../dao/MongooseArticleDao');
 const Article = require('../entities/Article');
-const Validator = require('../entities/Validator');
 
 class CreateArticleUseCase {
     constructor(articleDao) {

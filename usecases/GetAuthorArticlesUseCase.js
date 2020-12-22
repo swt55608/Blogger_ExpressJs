@@ -1,4 +1,5 @@
 const MongooseArticleDao = require("../dao/MongooseArticleDao");
+const Utility = require('../entities/Utility');
 
 class GetAuthorArticlesUseCase {
     constructor(articleDao = new MongooseArticleDao()) {
@@ -6,7 +7,9 @@ class GetAuthorArticlesUseCase {
     }
 
     async execute(authorname = '') {
-        return this.articleDao.findByAuthorName(authorname);
+        let articles = await this.articleDao.findByAuthorName(authorname);
+        console.log(articles);
+        return Utility.convertToJsonObject(articles);
     }
 }
 

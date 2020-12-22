@@ -1,4 +1,5 @@
 const Utility = require('../entities/Utility');
+const MongooseArticleDao = require('../dao/MongooseArticleDao');
 
 class GetAllArticlesUseCase {
     constructor(articleDao) {

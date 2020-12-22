@@ -24,19 +24,29 @@ class MongooseArticleDao {
     }
 
     async findAll() {
-        return ArticleModel.find();
+        let articles = [];
+        let articlesModel = await ArticleModel.find();
+        for (let articleModel of articlesModel) {
+            articles.push(new Article({
+                title: articleModel.title,
+                contents: articleModel.contents,
+                authorname: articleModel.authorname
+            }));
+        }
+        return articles;
     }
 
     async findByAuthorName(searchAuthorname = '') {
-        return ArticleModel.find({authorname: searchAuthorname})
-            .then(docs => {
-                if (docs !== null && docs.length > 0)
-                    return docs;
-                return [];
-            }).catch(err => {
-                console.error(err);
-                return [];
-            });
+        let articles = [];
+        let articlesModel = await ArticleModel.find({authorname: searchAuthorname});
+        for (let articleModel of articlesModel) {
+            articles.push(new Article({
+                title: articleModel.title,
+                contents: articleModel.contents,
+                authorname: articleModel.authorname
+            }));
+        }
+        return articles;
     }
 
     async isExist(article = new Article({title: '', contents: '', authorname: ''})) {

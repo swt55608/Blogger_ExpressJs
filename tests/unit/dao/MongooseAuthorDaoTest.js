@@ -1,5 +1,4 @@
 const assert = require('assert');
-const mongoose = require('mongoose');
 
 const AuthorModel = require('../../../dao/Author.model');
 const MongooseAuthorDao = require('../../../dao/MongooseAuthorDao');

@@ -4,7 +4,6 @@ const GetAuthorArticlesUseCase = require('../../../usecases/GetAuthorArticlesUse
 const CreateArticleUseCase = require('../../../usecases/CreateArticleUseCase');
 const MongooseArticleDao = require('../../../dao/MongooseArticleDao');
 const ArticleModel = require('../../../dao/Article.model');
-const Utility = require('../../../entities/Utility');
 
 describe('GetAuthorArticlesUseCase', () => {
     describe('#execute()', () => {
@@ -21,8 +20,7 @@ describe('GetAuthorArticlesUseCase', () => {
         it('should return empty when there is no article', async () => {
             let expectedArticles = [];
             let actualArticles = await getAuthorArticlesUseCase.execute('mike');
-            console.log(actualArticles);
-            assert.deepStrictEqual(Utility.convertToJsonObject(actualArticles), Utility.convertToJsonObject(expectedArticles));
+            assert.deepStrictEqual(actualArticles, expectedArticles);
         });
 
         it('should return all articles of the author', async () => {
@@ -37,7 +35,7 @@ describe('GetAuthorArticlesUseCase', () => {
             assert.strictEqual(isCreated, true);
 
             let actualArticles = await getAuthorArticlesUseCase.execute('mike');
-            assert.deepStrictEqual(Utility.convertToJsonObject(actualArticles), Utility.convertToJsonObject(expectedArticles));
+            assert.deepStrictEqual(actualArticles, expectedArticles);
         });
     });
 });

@@ -4,6 +4,7 @@ const sinon = require('sinon');
 const GetAllArticlesUseCase = require('../../../usecases/GetAllArticlesUseCase');
 const CreateArticleUseCase = require('../../../usecases/CreateArticleUseCase');
 const MongooseArticleDao = require('../../../dao/MongooseArticleDao');
+const Article = require('../../../entities/Article');
 
 describe('GetAllArticlesUseCase', () => {
     describe('#execute()', () => {
@@ -45,7 +46,15 @@ describe('GetAllArticlesUseCase', () => {
             isCreated = await createArticleUseCase.execute(expectedArticles[1]);
             assert.strictEqual(isCreated, true);
 
-            articleDaoStub.findAll.returns(expectedArticles);
+            let daoResult = [];
+            for (let articleObj of expectedArticles) {
+                daoResult.push(new Article({
+                    title: articleObj.title,
+                    contents: articleObj.contents,
+                    authorname: articleObj.authorname
+                }));
+            }
+            articleDaoStub.findAll.returns(daoResult);
             let actualArticles = await getAllArticlesUseCase.execute();
             assert.deepStrictEqual(actualArticles, expectedArticles);
         });
