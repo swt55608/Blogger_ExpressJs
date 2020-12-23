@@ -74,11 +74,11 @@ describe('MongooseArticleDao', () => {
         });
     });
 
-    describe('#findAll', () => {
+    describe('#findAll()', () => {
         it('should return empty when no article exists', async () => {
             let expectedArticles = [];
             let actualArticles = await articleDao.findAll();
-            assert.deepStrictEqual(Utility.convertToJsonObject(actualArticles), Utility.convertToJsonObject(expectedArticles));
+            assert.deepStrictEqual(Utility.convertCustomArrayToJsonObject(actualArticles), Utility.convertCustomArrayToJsonObject(expectedArticles));
         });
 
         it('should return all articles', async () => {
@@ -93,15 +93,15 @@ describe('MongooseArticleDao', () => {
             assert.strictEqual(await articleDao.create(expectedArticles[2]), true);
 
             let actualArticles = await articleDao.findAll();
-            assert.deepStrictEqual(Utility.convertToJsonObject(actualArticles), Utility.convertToJsonObject(expectedArticles));
+            assert.deepStrictEqual(Utility.convertCustomArrayToJsonObject(actualArticles), Utility.convertCustomArrayToJsonObject(expectedArticles));
         });
     });
 
-    describe('#findByAuthorName', () => {
+    describe('#findByAuthorName()', () => {
         it('should return empty when no article exists', async () => {
             let expectedArticles = [];
             let actualArticles = await articleDao.findAll();
-            assert.deepStrictEqual(Utility.convertToJsonObject(actualArticles), Utility.convertToJsonObject(expectedArticles));
+            assert.deepStrictEqual(Utility.convertCustomArrayToJsonObject(actualArticles), Utility.convertCustomArrayToJsonObject(expectedArticles));
         });
 
         it('should return all articles of the author', async () => {
@@ -114,7 +114,75 @@ describe('MongooseArticleDao', () => {
             assert.strictEqual(await articleDao.create(expectedArticles[1]), true);
 
             let actualArticles = await articleDao.findByAuthorName('mike');
-            assert.deepStrictEqual(Utility.convertToJsonObject(actualArticles), Utility.convertToJsonObject(expectedArticles));
+            assert.deepStrictEqual(Utility.convertCustomArrayToJsonObject(actualArticles), Utility.convertCustomArrayToJsonObject(expectedArticles));
+        });
+    });
+
+    describe('#findByTitleAndAuthorname()', async () => {
+        it('should return the article when match title and authorname', async () => {
+            let expectedArticleObj = new Article({title: 'Have a nice day', contents: '', authorname: 'mike'});
+            assert.strictEqual(await articleDao.create(expectedArticleObj), true);
+            let actualArticleObj = await articleDao.findByTitleAndAuthorname(expectedArticleObj.title, expectedArticleObj.authorname);
+            assert.deepStrictEqual(Utility.convertToJsonObject(actualArticleObj), Utility.convertToJsonObject(expectedArticleObj));
+        });
+
+        it('should return NULL when not match title and authorname', async () => {
+            let expectedArticleObj = new Article({title: 'Have a nice day', contents: '', authorname: 'mike'});
+            assert.strictEqual(await articleDao.create(expectedArticleObj), true);
+            let actualArticleObj = await articleDao.findByTitleAndAuthorname(expectedArticleObj.title, 'jack');
+            assert.deepStrictEqual(actualArticleObj, null);
+        });
+    });
+
+    describe('#update()', () => {
+        it('should return TRUE when successfully edit article title', async () => {
+            let oriArticleInfo = {title: 'Happy Day', contents: 'Today is a nice day.', authorname: 'mike'};
+            let newArticleInfo = {title: 'Very Happy Day', contents: oriArticleInfo.contents, authorname: oriArticleInfo.authorname};
+            assert.strictEqual(await articleDao.create(new Article(oriArticleInfo)), true);
+            assert.strictEqual(await articleDao.update(new Article(oriArticleInfo), new Article(newArticleInfo)), true);
+        });
+
+        it('should return TRUE when successfully edit article contents', async () => {
+            let oriArticleInfo = {title: 'Happy Day', contents: 'Today is a nice day.', authorname: 'mike'};
+            let newArticleInfo = {title: oriArticleInfo.title, contents: 'Something good would happen...', authorname: oriArticleInfo.authorname};
+            assert.strictEqual(await articleDao.create(new Article(oriArticleInfo)), true);
+            assert.strictEqual(await articleDao.update(new Article(oriArticleInfo), new Article(newArticleInfo)), true);
+        });
+
+        it('should return FALSE when there\'s no changes', async () => {
+            let oriArticleInfo = {title: 'Happy Day', contents: 'Today is a nice day.', authorname: 'mike'};
+            let newArticleInfo = oriArticleInfo;
+            assert.strictEqual(await articleDao.create(new Article(oriArticleInfo)), true);
+            assert.strictEqual(await articleDao.update(new Article(oriArticleInfo), new Article(newArticleInfo)), false);
+        });
+
+        it('should return FALSE when new title is undefined, null, or empty', async () => {
+            let oriArticleInfo = {title: 'Happy Day', contents: 'Today is a nice day.', authorname: 'mike'};
+            let newArticleInfo = {title: undefined, contents: oriArticleInfo.contents, authorname: oriArticleInfo.authorname};
+            assert.strictEqual(await articleDao.create(new Article(oriArticleInfo)), true);
+            assert.strictEqual(await articleDao.update(new Article(oriArticleInfo), new Article(newArticleInfo)), false);
+
+            newArticleInfo.title = null;
+            assert.strictEqual(await articleDao.update(new Article(oriArticleInfo), new Article(newArticleInfo)), false);
+
+            newArticleInfo.title = '';
+            assert.strictEqual(await articleDao.update(new Article(oriArticleInfo), new Article(newArticleInfo)), false);
+        });
+
+        it('should return FALSE when original title does not exist', async () => {
+            let oriArticleInfo = {title: 'Happy Day', contents: 'Today is a nice day.', authorname: 'mike'};
+            let wrongTitleArticleInfo = {title: 'New', contents: oriArticleInfo.contents, authorname: oriArticleInfo.authorname};
+            let newArticleInfo = {title: oriArticleInfo.title, contents: 'New Contents', authorname: oriArticleInfo.authorname};
+            assert.strictEqual(await articleDao.create(new Article(oriArticleInfo)), true);
+            assert.strictEqual(await articleDao.update(new Article(wrongTitleArticleInfo), new Article(newArticleInfo)), false);
+        });
+
+        it('should return FALSE when author is not the article author', async () => {
+            let oriArticleInfo = {title: 'Happy Day', contents: 'Today is a nice day.', authorname: 'mike'};
+            let wrongAuthorMatchArticleInfo = {title: oriArticleInfo.title, contents: oriArticleInfo.contents, authorname: 'jack'};
+            let newArticleInfo = {title: oriArticleInfo.title, contents: 'New Contents', authorname: oriArticleInfo.authorname};
+            assert.strictEqual(await articleDao.create(new Article(oriArticleInfo)), true);
+            assert.strictEqual(await articleDao.update(new Article(wrongAuthorMatchArticleInfo), new Article(newArticleInfo)), false);
         });
     });
 });

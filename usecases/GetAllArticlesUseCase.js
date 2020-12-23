@@ -12,7 +12,7 @@ class GetAllArticlesUseCase {
 
     async execute() {
         let articles = await this.articleDao.findAll();
-        let articlesObj = Utility.convertToJsonObject(articles);
+        let articlesObj = Utility.convertCustomArrayToJsonObject(articles);
         return articlesObj;
     }
 }
