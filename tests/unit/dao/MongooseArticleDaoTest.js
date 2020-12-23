@@ -185,4 +185,19 @@ describe('MongooseArticleDao', () => {
             assert.strictEqual(await articleDao.update(new Article(wrongAuthorMatchArticleInfo), new Article(newArticleInfo)), false);
         });
     });
+
+    describe('#delete()', () => {
+        it('should return TRUE when the title and author do exist', async () => {
+            let articleObj = {title: 'Have a nice day', contents: 'Today is a great day, better than yesterday.', authorname: 'mike'};
+            assert.strictEqual(await articleDao.create(new Article(articleObj)), true);
+            assert.strictEqual(await articleDao.delete(articleObj.title, articleObj.authorname), true);
+        });
+
+        it('should return FALSE when the title and author do not exist', async () => {
+            let articleObj = {title: 'Have a nice day', contents: 'Today is a great day, better than yesterday.', authorname: 'mike'};
+            assert.strictEqual(await articleDao.create(new Article(articleObj)), true);
+            assert.strictEqual(await articleDao.delete('New Title', articleObj.authorname), false);
+            assert.strictEqual(await articleDao.delete(articleObj.title, 'jack'), false);
+        });
+    });
 });

@@ -82,15 +82,23 @@ class MongooseArticleDao {
                 return ArticleModel.updateOne({$and: [{title: oriArticle.title}, {authorname: oriArticle.authorname}]}, newArticle)
                 .then(reply => {
                     // console.log(reply);
-                    if (reply.nModified > 0)
-                        return true;
-                    return false;
+                    return reply.nModified > 0;
                 }).catch(err => {
                     console.error(err);
                     return false;
                 });
             }
         }
+    }
+
+    async delete(searchTitle, searchAuthorname) {
+        return ArticleModel.deleteOne({$and: [{title: searchTitle}, {authorname: searchAuthorname}]})
+            .then(reply => {
+                // console.log(reply);
+                return reply.deletedCount > 0;
+            }).catch(err => {
+                return false;
+            });
     }
 
     async isExist(article = new Article({title: '', contents: '', authorname: ''})) {
