@@ -1,5 +1,4 @@
 const express = require('express');
-const router = express.Router();
 
 const RegisterUseCase = require('../usecases/RegisterUseCase');
 const LoginUseCase = require('../usecases/LoginUseCase');
@@ -10,6 +9,8 @@ mongoose.connect('mongodb://localhost:27017/blogger', {useNewUrlParser: true, us
 let db = mongoose.connection;
 db.on('error', () => console.error('Could not connect to MongoDB'));
 db.on('open', () => console.log('Connected to MongoDB'));
+
+const router = express.Router();
 
 router.post('/register/authors', async (req, res) => {
     let statusCode, msg;
