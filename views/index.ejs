@@ -1,35 +1,103 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Index</title>
-  </head>
-  <body>
-    <% if (data.account) { %> 
-      <h1>Welcome! Author: <%= data.account %> </h1>
-    <% } else { %> 
-      <h1>Please Login</h1>
+<head>
+	<meta charset="UTF-8">
+	<title>Insert title here</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+</head>
+<body class="w3-light-grey">
+	
+    <%- include errorMessageModal.ejs %>
+    <% if (requestScope.errorMessage) { %> 
+		<script>
+		document.getElementById('errorMessageModal').style.display='block';
+		</script>
     <% } %> 
-    
-    <hr>
 
-    <h1>Register</h1>
-    <form action="/authorManagement/register/authors" method="POST">
-      <input type="text" name="account" value="mike" placeholder="Account"><br>
-      <input type="password" name="password" value="mmm" placeholder="Password"><br>
-      <input type="text" name="name" value="Mike Mouse" placeholder="Name"><br>
-      <input type="submit">
-    </form>
+	<%- include register.ejs %>
+	<%- include login.ejs %>
 
-    <h1>Login</h1>
-    <form action="/authorManagement/login/authors" method="POST">
-      <input type="text" name="account" value="mike" placeholder="Account"><br>
-      <input type="password" name="password" value="mmm" placeholder="Password"><br>
-      <input type="submit">
-    </form>
+	<!-- w3-content defines a container for fixed size centered content, 
+	and is wrapped around the whole page content, except for the footer in this example -->
+	<div class="w3-content" style="max-width:1400px">
+	
+		<!-- Header -->
+		<header class="w3-container w3-center w3-padding-32"> 
+		  <h1><b>BLOGGER</b></h1>
+		  <!-- <c:if test="${empty sessionScope.username}"> -->
+            <% if (sessionScope.account === undefined || sessionScope.account === null) { %> 
+				<div>
+					<button onclick="document.getElementById('registerModal').style.display='block'" style="width:auto; background-color: #ff6666">Register</button>
+					<button onclick="document.getElementById('loginModal').style.display='block'" style="width:auto;">Login</button>
+                </div>
+            <% } else { %> 
+			<!-- </c:if> -->
+			
+			<!-- <c:if test="${!empty sessionScope.username}"> -->
+				<div>
+					Welcome! <a href="/author_personal_page?authorname=<%= sessionScope.account %> "><%= sessionScope.account %> <!-- ${sessionScope.username} --></a> |
+					<a href="/authorManagement/logout/authors">Logout</a>
+                </div>
+            <!-- </c:if> -->
+            <% } %> 
+		</header>
+		
+		<!-- <c:if test="${empty sessionScope.allArticles && empty sessionScope.username}"> -->
+        <% if (applicationScope.allArticles === undefined || applicationScope.allArticles === null || (applicationScope.allArticles instanceof Array && applicationScope.allArticles.length < 1)) { %> 
+            <% if (sessionScope.account === undefined || sessionScope.account === null || sessionScope.account === '') { %> 
+                <button onclick="document.getElementById('loginModal').style.display='block'" class="w3-xxlarge" style="width:100%; border:0px; padding:0px; margin:0px;">
+                    <div class="w3-container w3-gray w3-hover-green w3-center w3-allerta">
+                        No One Posts an Article here<br>Join Us to Post Your AMAZING Story
+                    </div>
+                </button>
+            <% } else { %> 
+                <a href="/create_article_page">
+                    <div class="w3-container w3-gray w3-hover-green w3-center w3-allerta">
+                      <p class="w3-xxlarge">Post Your AMAZING Story!</p>
+                    </div>
+                </a>
+            <% } %> 
+		<% } else { %> 
+			<!-- Grid -->
+			<div class="w3-row">
+		
+				<!-- <c:if test="${!empty sessionScope.allArticles}">	 -->
+					<!-- Blog entries -->
+					<div class="w3-col l12 s12">
+						<% for (let article of applicationScope.allArticles) { %> 
+						<!-- <c:forEach items="${sessionScope.allArticles}" var="article"> -->
+							<!-- Blog entry -->
+							<div class="w3-card-4 w3-margin w3-white">
+							<div class="w3-container">
+								<h3><b><%= article.title %> <!-- ${article.title} --></b></h3>
+								<h5><span class="w3-opacity">owned by <%= article.authorname %> <!-- ${article.authorName} --></span></h5>
+							</div>
+							
+							<div class="w3-container">
+								<p><%= article.contents %> <!-- ${article.content} --></p>
+							</div>
+							</div>
+							<hr>
+						<!-- </c:forEach> -->
+						<% } %> 
+					<!-- END BLOG ENTRIES -->
+					</div>
+				<!-- </c:if> -->
+			<!-- END GRID -->
+			</div><br>
+		<% } %> 
+		<!-- </c:if> -->
+		
+		<!-- <c:if test="${empty sessionScope.allArticles && !empty sessionScope.username}"> -->
+			
+		<!-- </c:if> -->
+		
+		
+		
+	<!-- END w3-content -->
+	</div>
 
-    <h1>Logout</h1>
-    <form action="/authorManagement/logout/authors" method="POST">
-      <input type="submit">
-    </form>
-  </body>
+</body>
 </html>

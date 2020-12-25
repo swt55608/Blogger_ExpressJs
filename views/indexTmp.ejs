@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Index</title>
+  </head>
+  <body>
+    <% if (data.account) { %> 
+      <h1>Welcome! Author: <%= data.account %> </h1>
+    <% } else { %> 
+      <h1>Please Login</h1>
+    <% } %> 
+    
+    <hr>
+
+    <h1>Register</h1>
+    <form action="/authorManagement/register/authors" method="POST">
+      <input type="text" name="account" value="mike" placeholder="Account"><br>
+      <input type="password" name="password" value="mmm" placeholder="Password"><br>
+      <input type="text" name="name" value="Mike Mouse" placeholder="Name"><br>
+      <input type="submit">
+    </form>
+
+    <h1>Login</h1>
+    <form action="/authorManagement/login/authors" method="POST">
+      <input type="text" name="account" value="mike" placeholder="Account"><br>
+      <input type="password" name="password" value="mmm" placeholder="Password"><br>
+      <input type="submit">
+    </form>
+
+    <h1>Logout</h1>
+    <form action="/authorManagement/logout/authors" method="POST">
+      <input type="submit">
+    </form>
+  </body>
+</html>

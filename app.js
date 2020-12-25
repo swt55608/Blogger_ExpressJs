@@ -9,6 +9,12 @@ const redis = require('redis');
 const redisClient = redis.createClient();
 const RedisStore = require('connect-redis')(session);
 
+const mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost:27017/blogger', {useNewUrlParser: true, useUnifiedTopology: true});
+let db = mongoose.connection;
+db.on('error', () => console.error('Could not connect to MongoDB'));
+db.on('open', () => console.log('Connected to MongoDB'));
+
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 let authorManagementRouter = require('./routes/authorManagement');
@@ -33,6 +39,14 @@ app.use(session({
   secret: generateRandomString(50),
   cookie: {maxAge: 2 * 60 * 1000, httpOnly: true}
 }));
+
+app.locals.applicationScope = {};
+
+app.use(function(req, res, next) {
+  res.locals.requestScope = {};
+  res.locals.sessionScope = req.session;
+  next();
+});
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);

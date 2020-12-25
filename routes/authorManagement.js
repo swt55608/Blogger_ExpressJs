@@ -4,52 +4,61 @@ const RegisterUseCase = require('../usecases/RegisterUseCase');
 const LoginUseCase = require('../usecases/LoginUseCase');
 const MongooseAuthorDao = require('../dao/MongooseAuthorDao');
 
-const mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost:27017/blogger', {useNewUrlParser: true, useUnifiedTopology: true});
-let db = mongoose.connection;
-db.on('error', () => console.error('Could not connect to MongoDB'));
-db.on('open', () => console.log('Connected to MongoDB'));
-
 const router = express.Router();
 
 router.post('/register/authors', async (req, res) => {
-    let statusCode, msg;
-    if (req.body) {
-        let {account, password, name} = req.body;
-        let authorObj = {account: account, password: password, name: name};
+    let requestScope = res.locals.requestScope;
+    let reqBody = req.body;
+    let statusCode = 500;
+    if (reqBody) {
+        let authorObj = {
+            account: reqBody.account, 
+            password: reqBody.password, 
+            name: reqBody.name
+        };
         let isRegistered = await new RegisterUseCase(new MongooseAuthorDao()).execute(authorObj);
-        req.session.author = isRegistered ? authorObj.account : null;
-        statusCode = isRegistered ? 201 : 401;
-        msg = isRegistered ? 'Registeration success' : 'Registeration failure';
+        if (isRegistered) {
+            statusCode = 201;
+            req.session.account = authorObj.account;
+        } else {
+            statusCode = 401;
+            requestScope.errorMessage = 'Incorrect Registration Info or Has Already Registered';
+        }
     } else {
         statusCode = 500;
-        msg = 'Wrong in reqBody';
+        requestScope.errorMessage = 'Wrong in reqBody';
     }
-    // res.status(statusCode).json({msg: msg});
-    res.status(statusCode).render('index', {data: {account: req.session.author}});
+    res.status(statusCode).render('index');
 });
 
 router.post('/login/authors', async (req, res) => {
-    let statusCode, msg;
-    if (req.body) {
-        let {account, password} = req.body;
-        let authorObj = {account: account, password: password};
+    let requestScope = res.locals.requestScope;
+    let reqBody = req.body;
+    let statusCode = 500;
+    if (reqBody) {
+        let authorObj = {
+            account: reqBody.account,
+            password: reqBody.password
+        };
         let isLogin = await new LoginUseCase(new MongooseAuthorDao()).execute(authorObj);
-        req.session.author = isLogin ? authorObj.account : null;
-        statusCode = isLogin ? 200 : 401;
-        msg = isLogin ? 'Login success' : 'Login failure';
+        if (isLogin) {
+            statusCode = 200;
+            req.session.account = authorObj.account;
+        } else {
+            statusCode = 401;
+            requestScope.errorMessage = 'Incorrect account or password';
+        }
     } else {
         statusCode = 500;
-        msg = 'Wrong in reqBody';
+        requestScope.errorMessage = 'Wrong in reqBody';
     }
-    // res.status(statusCode).json({msg: msg});
-    res.status(statusCode).render('index', {data: {account: req.session.author}});
+    res.status(statusCode).render('index');
 });
 
-router.post('/logout/authors', (req, res) => {
+router.get('/logout/authors', (req, res) => {
+    res.locals.sessionScope = {};
     req.session.destroy();
-    // res.status(200).json({msg: 'Logout success'});
-    res.status(200).render('index', {data: {}});
+    res.status(200).render('index');
 });
 
 module.exports = router;

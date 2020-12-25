@@ -11,12 +11,14 @@ const router = express.Router();
 
 router.post('/', async (req, res) => {
     let reqBody = req.body;
+    let reqSession = req.session;
     let statusCode = 400, responseObj = {msg: 'Failed at creating an article'};
-    if (reqBody) {
+    let renderToPage = 'create_article';
+    if (reqBody && reqSession) {
         let articleObj = {
             title: reqBody.title,
             contents: reqBody.contents,
-            authorname: reqBody.authorname
+            authorname: reqSession.account
         };
         let articleDao = new MongooseArticleDao();
         let createArticleUseCase = new CreateArticleUseCase(articleDao);
@@ -25,58 +27,75 @@ router.post('/', async (req, res) => {
             statusCode = 201;
             responseObj.msg = 'Successfully Created an Article';
             responseObj.article = articleObj;
+            renderToPage = 'author_personal_page';
+            await updateSessionArticles(req, res, articleObj.authorname);
         }
     }
-    res.status(statusCode).json(responseObj);
+    // res.status(statusCode).json(responseObj);
+    res.status(statusCode).render(renderToPage);
 });
 
-router.get('/', async (req, res) => {
-    let statusCode = 400, responseObj = {msg: 'Failed at getting articles'};
+// router.get('/', async (req, res) => {
+//     let statusCode = 400, responseObj = {msg: 'Failed at getting articles'};
+
+//     let articlesObj = await getAllArticles();
+
+//     statusCode = 200;
+//     responseObj.msg = 'Successfully at Getting all Articles';
+//     responseObj.article = articlesObj;
+//     res.status(statusCode).json(responseObj);
+// });
+
+// router.get('/authors/:authorname', async (req, res) => {
+//     let {authorname} = req.params;
+//     let statusCode = 400, responseObj = {msg: 'Failed at getting articles'};
+
+//     let articlesObj = await getAuthorArticles(authorname);
+
+//     statusCode = 200;
+//     responseObj.msg = `Successfully at Getting ${authorname}\' Articles`;
+//     responseObj.article = articlesObj;
+//     res.status(statusCode).json(responseObj);
+// });
+
+async function getAllArticles() {
     let articleDao = new MongooseArticleDao();
     let getAllArticlesUseCase = new GetAllArticlesUseCase(articleDao);
-    let articlesObj = await getAllArticlesUseCase.execute();
-    statusCode = 200;
-    responseObj.msg = 'Successfully at Getting all Articles';
-    responseObj.article = articlesObj;
-    res.status(statusCode).json(responseObj);
-});
+    return getAllArticlesUseCase.execute();
+}
 
-router.get('/authors/:authorname', async (req, res) => {
-    let {authorname} = req.params;
-    let statusCode = 400, responseObj = {msg: 'Failed at getting articles'};
+async function getAuthorArticles(authorname = '') {
     let articleDao = new MongooseArticleDao();
     let getAuthorArticlesUseCase = new GetAuthorArticlesUseCase(articleDao);
-    let articlesObj = await getAuthorArticlesUseCase.execute(authorname);
-    statusCode = 200;
-    responseObj.msg = `Successfully at Getting ${authorname}\' Articles`;
-    responseObj.article = articlesObj;
-    res.status(statusCode).json(responseObj);
-});
+    return getAuthorArticlesUseCase.execute(authorname);
+}
 
 router.put('/:title/authors/:authorname', async (req, res) => {
     let reqBody = req.body;
     let {title, authorname} = req.params;
     let statusCode = 400, responseObj = {msg: 'Failed at editting the article'};
-
+    let renderToPage = '/edit_article';
     if (reqBody) {
         let oriArticleInfo = {title: title, authorname: authorname};
-
         let newArticleInfo = {
             title: reqBody.title,
             contents: reqBody.contents,
             authorname: reqBody.authorname
         };
-
         let articleDao = new MongooseArticleDao();
         let editArticleUseCase = new EditArticleUseCase(articleDao);
-        
         let isEdited = await editArticleUseCase.execute(oriArticleInfo, newArticleInfo);
         if (isEdited) {
+            statusCode = 200;
             responseObj.msg = `Successfully at Editting ${authorname}\' Articles`;
+            renderToPage = '/author_personal_page';
+            await updateSessionArticles(req, res, authorname);
         }
     }
 
-    res.status(statusCode).json(responseObj);
+    // res.status(statusCode).json(responseObj);
+    res.status(statusCode).json({renderToPage: renderToPage});
+    // res.end();
 });
 
 router.delete('/:title/authors/:authorname', async (req, res) => {
@@ -89,9 +108,19 @@ router.delete('/:title/authors/:authorname', async (req, res) => {
     if(isDeleted) {
         statusCode = 200;
         responseObj.msg = 'Successfully at Deleting Articles';
+        await updateSessionArticles(req, res, authorname);
     }
     
-    res.status(statusCode).json(responseObj);
+    // res.status(statusCode).json(responseObj);
+    // res.status(statusCode).render('author_articles');
+    res.end();
 });
+
+async function updateSessionArticles(req, res, authorname = '') {
+    let authorArticlesObj = await getAuthorArticles(authorname);
+    let allArticlesObj = await getAllArticles();
+    req.app.locals.applicationScope.authorArticles = authorArticlesObj;
+    req.app.locals.applicationScope.allArticles = allArticlesObj;
+}
 
 module.exports = router;

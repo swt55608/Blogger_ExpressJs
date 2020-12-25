@@ -7,6 +7,8 @@ class GetAuthorArticlesUseCase {
     }
 
     async execute(authorname = '') {
+        console.log(`GetAuthorArticlesUseCase.execute(${authorname})`);
+
         let articles = await this.articleDao.findByAuthorName(authorname);
         return Utility.convertCustomArrayToJsonObject(articles);
     }

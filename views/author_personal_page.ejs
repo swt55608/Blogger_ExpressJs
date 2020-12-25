@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Insert title here</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+	<style>
+	.w3-allerta {
+	  font-family: "Allerta Stencil", Sans-serif;
+	}
+	</style>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body class="w3-light-grey">
+	
+	<!-- w3-content defines a container for fixed size centered content, 
+	and is wrapped around the whole page content, except for the footer in this example -->
+	<div class="w3-content" style="max-width:1400px">
+	
+		<!-- Header -->
+		<header class="w3-container w3-center w3-padding-32"> 
+		  <h1><b>MY BLOG</b></h1>
+		  <p>Welcome to the blog of <span class="w3-tag"><%= sessionScope.account %> <!-- ${sessionScope.username} --></span></p>
+		  <a href="/create_article_page">Create an Article</a> | 
+		  <a href="/">Back to Index</a>
+		</header>
+		
+		<!-- Grid -->
+		<div class="w3-row">
+            
+            <% if (applicationScope.authorArticles === undefined || applicationScope.authorArticles === null || (applicationScope.authorArticles instanceof Array && applicationScope.authorArticles.length < 1)) { %> 
+			<!-- <c:if test="${empty sessionScope.authorArticles}"> -->
+				<a href="/create_article_page">
+					<div class="w3-container w3-gray w3-hover-green w3-center w3-allerta">
+					  <p class="w3-xxlarge">No Article here...Create a new one</p>
+					</div>
+				</a>
+			<!-- </c:if> -->
+			<% } else { %> 
+			<!-- <c:if test="${!empty sessionScope.authorArticles}"> -->
+				<!-- Blog entries -->
+				<div id="showAuthorBlogs" class="w3-col l12 s12">
+					<%- include author_articles.ejs %> 
+				<!-- END BLOG ENTRIES -->
+				</div>
+			<!-- </c:if> -->
+			<% } %> 
+		
+		<!-- END GRID -->
+		</div><br>
+	
+	<!-- END w3-content -->
+	</div>
+
+	
+</body>
+</html>

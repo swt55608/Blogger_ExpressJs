@@ -1,0 +1,44 @@
+<% let alinkId = 0; %> 
+<% for (let article of applicationScope.authorArticles) { %> 
+<!-- <c:forEach items="${sessionScope.authorArticles}" var="article"> -->
+    <!-- Blog entry -->
+    <div class="w3-card-4 w3-margin w3-white">
+        <div class="w3-container">
+        <h3><b><%= article.title %> <!-- ${article.title} --></b></h3>
+        <h5><span class="w3-opacity">owned by <%= article.authorname %> <!-- ${article.authorName} --></span></h5>
+        </div>
+    
+        <div class="w3-container">
+            <p><%= article.contents %> <!--${article.content} --></p>
+            <div class="w3-row">
+                <div class="w3-col m8 s12">
+                <p><a class="w3-button w3-hover-blue w3-padding-large w3-white w3-border" href="/edit_article_page?title=<%= article.title %>&contents=<%= article.contents %>&authorname=<%= article.authorname %>"><b>Edit</b></a></p>
+                </div>
+                <div class="w3-col m4 s12 w3-right-align">
+                <p><a id="todelete<%= alinkId %>" class="w3-button w3-hover-red w3-padding-large w3-black w3-border"><b>Delete</b></a></p>
+            </div>
+        </div>
+        </div>
+    </div>
+    <hr>
+
+    <script>
+        $(document).ready(function() {
+            $("a#todelete<%- alinkId %>").click(function() {
+                $.ajax({
+                    url: '/articles/' + '<%- article.title %>' + '/authors/' + '<%- article.authorname %>',
+                    type: 'DELETE',
+                    success: function(data) {
+                        console.log(data);
+                        // $("div#showAuthorBlogs").html(data);
+                        window.location.href = "/author_personal_page";
+                    }
+                });
+            });
+        });
+    </script>
+
+    <% alinkId++; %> 
+<!-- </c:forEach> -->
+<% } %> 
+

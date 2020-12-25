@@ -12,6 +12,9 @@ class RegisterUseCase {
 
     async execute(authorObj = {account: '', password: '', name: ''}) {
         let author = new Author(authorObj);
+
+        console.log(`InExecute => author: {account: ${author.account}, password: ${author.password}, name: ${author.name}}`);
+
         if (Validator.isInvalid(authorObj)) {
             return false;
         } else if (await this.authorDao.isExist(author)) {

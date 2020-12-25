@@ -13,10 +13,13 @@ class CreateArticleUseCase {
     async execute(articleObj = {title: '', contents: '', authorname: ''}) {
         let article = new Article(articleObj);
         if (this.articleDao.isInvalid(article)) {
+            console.log('isInvalid');
             return false;
         } else if (await this.articleDao.isExist(article)) {
+            console.log('isExist');
             return false;
         } else {
+            console.log('articleDao.create');
             return this.articleDao.create(article);
         }
     }

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Insert title here</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body class="w3-light-grey">
+	
+	<%- include errorMessageModal.ejs %>
+	<% if (requestScope.errorMessage) { %> 
+	<!-- <c:if test="${!empty requestScope.errorMessage}"> -->
+		<script>
+		document.getElementById('errorMessageModal').style.display='block';
+		</script>
+	<!-- </c:if> -->
+	<% } %> 
+
+	<div class="w3-content" style="max-width:1400px">
+	
+		<!-- Header -->
+		<header class="w3-container w3-center w3-padding-32"> 
+		  <h1><b>MY BLOG</b></h1>
+		  <p>Welcome to the blog of <span class="w3-tag"><%= sessionScope.account %> <!-- ${sessionScope.username} --></span></p>
+		  <a href="/">Back to Index</a>
+		</header>
+		
+		<!-- Grid -->
+		<div class="w3-row">
+		
+			<!-- Blog entries -->
+			<div class="w3-col l12 s12">
+				<form id="editArticleForm" action="/articles/<%= requestQuery.article.title %>/authors/<%= requestQuery.article.authorname %>" method="post"> 
+					<!-- Blog entry -->
+					<div class="w3-card-4 w3-margin w3-white">
+					  <div class="w3-container">
+					  	<input type="hidden" name="articleTitle" value="<%= requestQuery.article.title %>">
+					    <h3><b><input id="title" type="text" name="newArticleTitle" value="<%= requestQuery.article.title %>" placeholder="Enter Title" style="background-color: white; border: 1px solid gray"></b></h3>
+					  </div>
+					
+					  <div class="w3-container">
+					     <p><textarea id="contents" type="text" name="newArticleContent" placeholder="Enter Contents" rows="6" cols="100%" style="background-color: white; border: 1px solid gray"><%= requestQuery.article.contents %></textarea></p>
+						 <div class="w3-row">
+							<div class="w3-col m12 s12 w3-right-align">
+								<p>
+									<a href="/author_personal_page" class="w3-button w3-hover-gray w3-padding-large w3-white w3-border"><b>Cancel</b></a>
+									<button id="toedit" type="button" class="w3-button w3-hover-blue w3-padding-large w3-black w3-border"><b>Edit</b></button>
+								</p>
+							</div>
+					  	 </div>
+					  </div>
+					</div>
+				<!-- END BLOG ENTRIES -->
+				</form>
+			</div>
+		<!-- END GRID -->
+		</div><br>
+	
+	<!-- END w3-content -->
+	</div>
+
+	<script>
+        $(document).ready(function() {
+			$("button#toedit").click(function() {
+				console.log('hi');
+				$.ajax({
+                    url: '/articles/' + '<%- requestQuery.article.title %>' + '/authors/' + '<%- requestQuery.article.authorname %>',
+					type: 'PUT',
+					data: {title: $('#title').val(), contents: $('#contents').val(), authorname: '<%- requestQuery.article.authorname %>'},
+                    success: function(data) {
+                        // console.log(data);
+						// $("div#showAuthorBlogs").html(data);
+						// window.location.href = "/author_personal_page";
+						window.location.href = data.renderToPage;
+                    }
+                });
+			});
+
+			// $("#editArticleForm").submit(function(event) {
+
+				/* stop form from submitting normally */
+				// event.preventDefault();
+
+				// /* get the action attribute from the <form action=""> element */
+				// var $form = $(this),
+				// url = $form.attr('action');
+
+				/* Send the data using post with element id name and name2*/
+				// var posting = $.post(url, {
+				// 	name: $('#name').val(),
+				// 	name2: $('#name2').val()
+				// });
+
+				
+
+				// /* Alerts the results */
+				// posting.done(function(data) {
+				// 	$('#result').text('success');
+				// });
+				// posting.fail(function() {
+				// 	$('#result').text('failed');
+				// });
+			// });
+		});
+		
+		
+    </script>
+</body>
+</html>
